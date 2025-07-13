@@ -23,6 +23,13 @@ public class PollItem {
         }
     }
 
+    public void clearAnswers(){
+        for (int i = 0; i < this.answer.length; i++){
+            this.answer[i] = null;
+        }
+        this.currentAnswerIndex = 0;
+    }
+
     public String getQuestion() {
         return question;
     }
