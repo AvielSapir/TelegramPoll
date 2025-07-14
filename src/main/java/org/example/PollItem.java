@@ -10,7 +10,6 @@ public class PollItem {
         this.question = questions;
         this.answer = new String[3];
         this.currentAnswerIndex = 0;
-
     }
 
     public boolean addAnswer(String answer) {
