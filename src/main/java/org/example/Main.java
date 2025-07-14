@@ -16,8 +16,11 @@ public class Main {
 
         Poll poll = new Poll(2);
         PollItem p1 = new PollItem("color");
+        PollItem p2 = new PollItem("number");
         p1.setAnswer(new String[]{"red", "blue", "green"});
+        p2.setAnswer(new String[]{"1", "2", "3"});
         poll.addQuestion(p1);
+        poll.addQuestion(p2);
 
         MyBot bot = new MyBot();
         bot.sendPoll(poll);
