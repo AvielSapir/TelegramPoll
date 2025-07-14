@@ -6,13 +6,13 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 public class Main {
     public static void main(String[] args) {
+        MyBot bot = new MyBot();
         try{
             TelegramBotsApi api =  new TelegramBotsApi(DefaultBotSession.class);
-            api.registerBot(new MyBot());
+            api.registerBot(bot);
         }catch (TelegramApiException e){
             throw new RuntimeException();
         }
-
 
         Poll poll = new Poll(2);
         PollItem p1 = new PollItem("color");
@@ -22,7 +22,6 @@ public class Main {
         poll.addQuestion(p1);
         poll.addQuestion(p2);
 
-        MyBot bot = new MyBot();
         bot.sendPoll(poll);
     }
 }

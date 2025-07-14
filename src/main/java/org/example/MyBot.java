@@ -4,22 +4,24 @@ import org.telegram.telegrambots.meta.api.methods.polls.SendPoll;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 
 public class MyBot extends TelegramLongPollingBot {
 
     private final UserManager userManager;
+    private Map<String, PollItem> pollIdMap;
+    private Poll currentPoll;
 
     public MyBot() {
         this.userManager = new UserManager();
+        this.pollIdMap = new HashMap<>();
+        this.currentPoll = null;
     }
 
     @Override
@@ -34,14 +36,35 @@ public class MyBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        Long chatId = update.getMessage().getChatId();
-        if (Objects.equals(update.getMessage().getText().toLowerCase(), "/start") || Objects.equals(update.getMessage().getText(), "hi") || Objects.equals(update.getMessage().getText(), "היי")) {
-            if (userManager.addUserId(chatId)) {
-                sendMessage(chatId, "hello! welcome to poll bot!");
+        System.out.println("message received");
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            if (Objects.equals(update.getMessage().getText().toLowerCase(), "/start") || Objects.equals(update.getMessage().getText(), "hi") || Objects.equals(update.getMessage().getText(), "היי")) {
+                Long chatId = update.getMessage().getChatId();
+                if (userManager.addUserId(chatId)) {
+                    sendMessage(chatId, "hello! welcome to poll bot!");
+                    return;
+                }
             }
+        }
+        if (update.hasPoll()){
+            updatePollAnswer(update);
+            return;
         }
     }
 
+    private void updatePollAnswer(Update update) {
+        String pollId = update.getPoll().getId();
+        PollItem pollItem = pollIdMap.get(pollId);
+        if (pollItem != null) {
+            System.out.println("    |name: " + pollItem.getQuestion());
+            System.out.println("    |number of voters: " + update.getPoll().getTotalVoterCount());
+
+            for (int i = 0; i < update.getPoll().getOptions().size(); i++) {
+                pollItem.addCount(i, update.getPoll().getOptions().get(i).getVoterCount());
+            }
+        }
+        System.out.println("    | " + Arrays.toString(pollItem.getAnswerCount()));
+    }
 
     private void sendMessage(long chatId, String text) {
         SendMessage sendMessage = new SendMessage();
@@ -55,9 +78,11 @@ public class MyBot extends TelegramLongPollingBot {
     }
 
     public void sendPoll(Poll poll) {
-        PollItem[] questions = poll.getQuestions();
-
-
+        if (poll == null) {
+            return;
+        }
+        this.currentPoll = poll;
+        PollItem[] questions = currentPoll.getQuestions();
 //        if (this.userManager.getUsersId().size() < 3) {
 //            System.out.println("not enough users! ");
 //            return;
@@ -74,7 +99,9 @@ public class MyBot extends TelegramLongPollingBot {
                 sendPoll.setQuestion(question.getQuestion());
                 sendPoll.setOptions(Arrays.stream(question.getAnswer()).toList());
                 try {
-                    execute(sendPoll);
+                    Message sentMessage = execute(sendPoll);
+                    this.pollIdMap.put(sentMessage.getPoll().getId(), question);
+
                 }catch (TelegramApiException e){
                     throw new RuntimeException();
                 }
@@ -82,5 +109,12 @@ public class MyBot extends TelegramLongPollingBot {
         }
     };
 
-
+    public boolean allAnswered(){
+        for (PollItem pollItem: currentPoll.getQuestions()) {
+            if (pollItem.howManyAnswers() != this.userManager.getUsersId().size()) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
