@@ -1,14 +1,19 @@
 package org.example;
 
+import java.util.Arrays;
+
 public class PollItem {
     private String question;
     private String[] answer;
+
+    private int[] answerCount;
     private int currentAnswerIndex;
 
 
     public PollItem(String questions) {
         this.question = questions;
         this.answer = new String[3];
+        this.answerCount = new int[3];
         this.currentAnswerIndex = 0;
 
     }
@@ -42,7 +47,19 @@ public class PollItem {
         return answer;
     }
 
+    public void addCount(int answerNumber, int value) {
+        this.answerCount[answerNumber] += value;
+    }
+
     public void setAnswer(String[] answer) {
         this.answer = answer;
+    }
+
+    public int[] getAnswerCount() {
+        return answerCount;
+    }
+
+    public int howManyAnswers() {
+        return Arrays.stream(this.answerCount).sum();
     }
 }
