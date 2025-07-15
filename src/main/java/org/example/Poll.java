@@ -35,4 +35,16 @@ public class Poll {
     public void setCurrentSize(int currentSize) {
         this.currentSize = currentSize;
     }
+
+   public String toString(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("Poll contains ").append(this.currentSize).append("question \n \n");
+
+       for (int i = 0; i < this.currentSize; i++) {
+           sb.append("Question: ").append(i + 1).append("\n");
+           sb.append(this.questions[i].toString()).append("\n");
+       }
+       return sb.toString();
+
+   }
 }

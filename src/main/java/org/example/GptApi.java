@@ -28,7 +28,7 @@ public class GptApi {
                     "(Answer3)\n" +
                     "\n" +
                     "Not a test-like question, but a preference questionnaire.\n" +
-                    "I want it to be in this format without additions before and after, between each sentence - question or answer there will be a # \n" +
+                    "I want it to be in this format without additions before and after, between each sentence - question or answer there will be a # but not in the end\n" +
                     "The topic of the question is only about:" + question;
             String url = "https://app.seker.live/fm1/send-message?id=330745084&text=" +
                     URLEncoder.encode(porompt, StandardCharsets.UTF_8);
@@ -56,11 +56,12 @@ public class GptApi {
             String question = parts[index].trim();
             PollItem pollItem = new PollItem(question);
 
-            for (int j = 1; j < 3; j++) {
+            for (int j = 1; j <= 3; j++) {
                 pollItem.addAnswer(parts[index + j].trim());
             }
             poll.addQuestion(pollItem);
         }
+        System.out.println(poll);
         return poll;
     }
 

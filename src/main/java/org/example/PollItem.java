@@ -1,5 +1,7 @@
 package org.example;
 
+import org.apache.http.conn.util.PublicSuffixList;
+
 public class PollItem {
     private String question;
     private String[] answer;
@@ -22,8 +24,8 @@ public class PollItem {
         }
     }
 
-    public void clearAnswers(){
-        for (int i = 0; i < this.answer.length; i++){
+    public void clearAnswers() {
+        for (int i = 0; i < this.answer.length; i++) {
             this.answer[i] = null;
         }
         this.currentAnswerIndex = 0;
@@ -43,5 +45,16 @@ public class PollItem {
 
     public void setAnswer(String[] answer) {
         this.answer = answer;
+    }
+
+    public String toString() {
+       StringBuilder sb = new StringBuilder();
+       sb.append("Question: ").append(this.question).append("\n");
+
+        for (int i = 0; i < this.answer.length; i++) {
+            sb.append("  ").append((char)('A' + i)).append(") ").append(this.answer[i]).append("\n");
+
+        }
+        return sb.toString();
     }
 }
