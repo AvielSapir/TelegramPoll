@@ -4,8 +4,8 @@ public class Poll {
     private PollItem[] questions;
     private int currentSize;
 
-    public Poll(int maxSize){
-        this.questions = new PollItem[maxSize];
+    public Poll(){
+        this.questions = new PollItem[3];
         this.currentSize = 0;
     }
 
