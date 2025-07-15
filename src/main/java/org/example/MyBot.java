@@ -96,6 +96,8 @@ public class MyBot extends TelegramLongPollingBot {
             SendPoll sendPoll = new SendPoll();
             sendPoll.setChatId(user);
             for (PollItem question: questions) {
+                if(question == null)
+                    continue;
                 sendPoll.setQuestion(question.getQuestion());
                 sendPoll.setOptions(Arrays.stream(question.getAnswer()).toList());
                 try {
