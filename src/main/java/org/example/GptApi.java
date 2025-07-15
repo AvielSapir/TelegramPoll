@@ -48,10 +48,9 @@ public class GptApi {
 
     public Poll createByGpt(String sub, int sumQuestions){
         String[] parts = gpt(sub, sumQuestions);
-        int totalItem = parts.length / 4;
-        Poll poll = new Poll(totalItem);
+        Poll poll = new Poll();
 
-        for (int i = 0; i < totalItem; i++) {
+        for (int i = 0; i < poll.getCurrentSize(); i++) {
             int index = i * 4;
             String question = parts[index].trim();
             PollItem pollItem = new PollItem(question);

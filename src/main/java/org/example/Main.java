@@ -6,23 +6,82 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Arrays;
 
 public class Main {
+    static int WIDTH = 1080;
+    static int HEIGHT = 720;
+    static Poll poll = new Poll();
+
 
     public static void main(String[] args) {
-//        MyBot bot = new MyBot();
-//        botConfig(bot);
-//        sendPollExample(bot);
+        //bot
+        MyBot bot = new MyBot();
+        botConfig(bot);
 
-        // GUI
+        // window
         JFrame window = new JFrame();
-        windowConfig(window);
+        windowConfig(window, bot);
+
+        //create poll
+        createPoll(window);
+        window.repaint();
+
+        //send poll
+        bot.sendPoll(poll);
+
+        // waiting...
+        waiting(window, bot);
+
+        System.out.println(calculateStatistic(poll.getQuestions()[0], 0));
+        System.out.println(calculateStatistic(poll.getQuestions()[0], 1));
+        System.out.println(calculateStatistic(poll.getQuestions()[0], 2));
+
+        //show result
+        showResult(window);
 
     }
 
-    public static void windowConfig(JFrame window) {
-        int WIDTH = 1080;
-        int HEIGHT = 720;
+
+    public static void createPoll(JFrame window) {
+        CreatePollPanel pollPanel = new CreatePollPanel(WIDTH, HEIGHT, window);
+        window.add(pollPanel);
+        window.setVisible(true);
+        window.setLocationRelativeTo(null);
+        window.setTitle("Poll bot");
+        while (!pollPanel.isSend()){
+            sleepFor(100);
+        }
+        poll = pollPanel.getPoll();
+        window.remove(pollPanel);
+    }
+
+    public static void waiting(JFrame window, MyBot bot) {
+        int minutes = 5;
+        long startTime = System.currentTimeMillis();
+
+        while (System.currentTimeMillis() - startTime < 60000 * minutes) {
+            if(bot.isAllAnswered()){
+                break;
+            }
+
+            //todo add waiting screen
+
+            sleepFor(100);
+        }
+    }
+
+    public static void showResult(JFrame window) {
+        //todo
+    }
+
+    public static int calculateStatistic(PollItem pollItem, int questionNumber) {
+        int numOfUsers = pollItem.howManyAnswers();
+        return (pollItem.getAnswerCount()[questionNumber] / numOfUsers) * 100;
+    }
+
+    public static void windowConfig(JFrame window, MyBot bot) {
+        Poll poll = new Poll();
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setSize(1080, 720);
         window.setResizable(false);
@@ -31,19 +90,9 @@ public class Main {
         window.setLocationRelativeTo(null);
         window.setTitle("Poll bot");
         window.getContentPane().setBackground(new Color(40, 40, 40));
-
-        CreatePollPanel pollPanel = new CreatePollPanel(WIDTH, HEIGHT, window);
-        window.add(pollPanel);
-        window.setVisible(true);
-        window.setLocationRelativeTo(null);
-        window.setTitle("Poll bot");
-
-
-//        AddQuestion addQuestion = new AddQuestion(window);
-//        addQuestion.setLocationRelativeTo(window);
-//        addQuestion.setVisible(true);
-
+        window.repaint();
     }
+
     public static void botConfig(MyBot bot){
         try{
             TelegramBotsApi api =  new TelegramBotsApi(DefaultBotSession.class);
@@ -52,15 +101,12 @@ public class Main {
             throw new RuntimeException();
         }
     }
-    public static void sendPollExample(MyBot bot){
-        Poll poll = new Poll(2);
-        PollItem p1 = new PollItem("color");
-        PollItem p2 = new PollItem("number");
-        p1.setAnswer(new String[]{"red", "blue", "green"});
-        p2.setAnswer(new String[]{"1", "2", "3"});
-        poll.addQuestion(p1);
-        poll.addQuestion(p2);
 
-        bot.sendPoll(poll);
+    public static void sleepFor(long millis){
+        try {
+            Thread.sleep(millis);
+        }catch (InterruptedException e){
+            e.printStackTrace();
+        }
     }
 }

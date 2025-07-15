@@ -18,6 +18,7 @@ public class MyBot extends TelegramLongPollingBot {
     private Map<String, PollItem> pollIdMap;
     private Poll currentPoll;
 
+
     public MyBot() {
         this.userManager = new UserManager();
         this.pollIdMap = new HashMap<>();
@@ -96,6 +97,9 @@ public class MyBot extends TelegramLongPollingBot {
             SendPoll sendPoll = new SendPoll();
             sendPoll.setChatId(user);
             for (PollItem question: questions) {
+                if (question == null){
+                    continue;
+                }
                 sendPoll.setQuestion(question.getQuestion());
                 sendPoll.setOptions(Arrays.stream(question.getAnswer()).toList());
                 try {
@@ -109,12 +113,15 @@ public class MyBot extends TelegramLongPollingBot {
         }
     };
 
-    public boolean allAnswered(){
+    public boolean isAllAnswered(){
         for (PollItem pollItem: currentPoll.getQuestions()) {
+            if(pollItem == null){
+                continue;
+            }
             if (pollItem.howManyAnswers() != this.userManager.getUsersId().size()) {
                 return false;
             }
         }
         return true;
     }
-    }
+}

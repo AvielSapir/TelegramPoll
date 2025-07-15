@@ -7,11 +7,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class CreatePollPanel extends JPanel {
-
-    int WIDTH;
-    int HEIGHT;
+    private Poll poll;
+    private boolean send = false;
+    private int WIDTH;
+    private int HEIGHT;
 
     public CreatePollPanel(int width, int height, JFrame window) {
+        this.poll = new Poll();
         this.WIDTH = width;
         this.HEIGHT = height;
         setSize(WIDTH, HEIGHT);
@@ -29,10 +31,26 @@ public class CreatePollPanel extends JPanel {
         panel2.setLayout(new BoxLayout(panel2, BoxLayout.Y_AXIS));
         panel1.setLayout(new BoxLayout(panel1, BoxLayout.Y_AXIS));
 
+        JButton addQButton = addQBT(window, panel2);
+        JButton sendButton = sendBT(window, panel2);
+        JButton gptButton = gptBT(window, panel2);
 
-        panel1.add(addQBT(window, panel2));
-        panel1.add(sendBT(window, panel2));
-        panel1.add(gptBT(window, panel2));
+        panel1.add(addQButton);
+        panel1.add(sendButton);
+        panel1.add(gptButton);
+
+        addQButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        sendButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        gptButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        panel1.add(addQButton);
+        panel1.add(Box.createVerticalStrut(20));
+        panel1.add(sendButton);
+        panel1.add(Box.createVerticalStrut(20));
+        panel1.add(gptButton);
+
+        panel1.add(Box.createVerticalGlue());
+
 
     }
 
@@ -49,7 +67,6 @@ public class CreatePollPanel extends JPanel {
         panel.add(optionLabel2);
         panel.add(optionLabel3);
         panel.add(space);
-        System.out.println("addCard");
         panel.revalidate();
         panel.repaint();
     }
@@ -70,22 +87,23 @@ public class CreatePollPanel extends JPanel {
     }
 
     private JButton addQBT(JFrame frame, JPanel panel) {
-        JButton addQBT = new JButton("Add Question");
+        JButton addQBT = new JButton("Add question");
         addQBT.setBackground(new Color(37, 37, 37));
         addQBT.setForeground(new Color(208, 208, 208));
         addQBT.setFont(new Font("Arial", Font.BOLD, 15));
         addQBT.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         addQBT.setBorderPainted(false);
-        addQBT.setPreferredSize(new Dimension(200, 40));
+        addQBT.setPreferredSize(new Dimension(400, 70));
+
         addQBT.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 AddQuestion addQuestion = new AddQuestion(frame);
                 addQuestion.setLocationRelativeTo(frame);
                 addQuestion.setVisible(true);
-                if (addQuestion.isFull()) {
+                if (addQuestion.isFull() && poll.getCurrentSize() <= 3) {
                     addCard(panel ,addQuestion.getQuestionValue(), addQuestion.getAnswerValue1(), addQuestion.getAnswerValue2(), addQuestion.getAnswerValue3());
-                    System.out.println(addQuestion.getQuestionValue());
+                    addPollItem(addQuestion.getQuestionValue(), addQuestion.getAnswerValue1(), addQuestion.getAnswerValue2(), addQuestion.getAnswerValue3());
                 }
             }
         });
@@ -94,36 +112,56 @@ public class CreatePollPanel extends JPanel {
 
     //todo
     private JButton sendBT(JFrame frame, JPanel panel) {
-        JButton addQBT = new JButton("send");
+        JButton addQBT = new JButton("Send");
         addQBT.setBackground(new Color(37, 37, 37));
         addQBT.setForeground(new Color(208, 208, 208));
         addQBT.setFont(new Font("Arial", Font.BOLD, 15));
         addQBT.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         addQBT.setBorderPainted(false);
-        addQBT.setPreferredSize(new Dimension(200, 40));
+        addQBT.setPreferredSize(new Dimension(400, 70));
         addQBT.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                if (poll.getCurrentSize() >= 1) {
+                    send = true;
+                }else {
+                    JOptionPane.showMessageDialog(null, "You need to send at least one question");
+                }
             }
         });
         return addQBT;
     }
     private JButton gptBT(JFrame frame, JPanel panel) {
-        JButton addQBT = new JButton("create with GPt");
+        JButton addQBT = new JButton("Create with GPT");
         addQBT.setBackground(new Color(37, 37, 37));
         addQBT.setForeground(new Color(208, 208, 208));
         addQBT.setFont(new Font("Arial", Font.BOLD, 15));
-        addQBT.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        addQBT.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 10));
         addQBT.setBorderPainted(false);
-        addQBT.setPreferredSize(new Dimension(200, 40));
+        addQBT.setPreferredSize(new Dimension(400, 70));
+
         addQBT.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                //todo
             }
         });
         return addQBT;
     }
 
+    private void addPollItem(String question, String option1, String option2, String option3) {
+        PollItem pollItem = new PollItem(question);
+        pollItem.addAnswer(option1);
+        pollItem.addAnswer(option2);
+        pollItem.addAnswer(option3);
+        this.poll.addQuestion(pollItem);
+    }
+
+    public Poll getPoll() {
+        return poll;
+    }
+
+    public boolean isSend() {
+        return send;
+    }
 }
