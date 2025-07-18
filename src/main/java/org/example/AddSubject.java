@@ -13,7 +13,7 @@ public class AddSubject extends JDialog{
     private boolean full = false;
 
     public AddSubject(JFrame parent) {
-        super(parent, "Add Question", true);
+        super(parent, "Create with GPT", true);
         setSize(300, 150);
         setLocationRelativeTo(parent);
         setLayout(new GridLayout(4, 1, 10, 10)); // Changed layout to accommodate new elements
@@ -22,7 +22,7 @@ public class AddSubject extends JDialog{
         setResizable(false);
 
         textField = newTextField();
-        JLabel subjectLabel = newLabel("SUBJECT", 20);
+        JLabel subjectLabel = newLabel("Subject", 20);
         JLabel amountLabel = newLabel("Amount of questions to create", 17); // New label for amount
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0)); // Panel for buttons
