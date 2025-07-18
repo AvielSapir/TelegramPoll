@@ -35,21 +35,32 @@ public class CreatePollPanel extends JPanel {
         JButton sendButton = sendBT(window, panel2);
         JButton gptButton = gptBT(window, panel2);
 
-        panel1.add(addQButton);
-        panel1.add(sendButton);
-        panel1.add(gptButton);
+//        panel1.add(addQButton);
+//        panel1.add(sendButton);
+//        panel1.add(gptButton);
 
         addQButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         sendButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         gptButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        panel1.add(addQButton);
-        panel1.add(Box.createVerticalStrut(20));
-        panel1.add(sendButton);
-        panel1.add(Box.createVerticalStrut(20));
-        panel1.add(gptButton);
+        JLabel titleLabel = new JLabel("Create Poll", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 50));
+        titleLabel.setForeground(Color.WHITE);
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(40, 0, 40, 0));
+        panel1.add(titleLabel);
 
+        //panel1.add(Box.createVerticalStrut(100));
+        //panel1.add(Box.createVerticalGlue());
+        panel1.add(addQButton);
+        //panel1.add(Box.createVerticalStrut(50));
         panel1.add(Box.createVerticalGlue());
+        panel1.add(sendButton);
+        //panel1.add(Box.createVerticalStrut(50));
+        panel1.add(Box.createVerticalGlue());
+        panel1.add(gptButton);
+        panel1.add(Box.createVerticalGlue());
+        //panel1.add(Box.createVerticalGlue());
 
 
     }
@@ -61,12 +72,12 @@ public class CreatePollPanel extends JPanel {
         JLabel optionLabel3 = newLabel(option3, 18);
         JLabel space = newLabel("", 10);
 
-
         panel.add(questionLabel);
         panel.add(optionLabel1);
         panel.add(optionLabel2);
         panel.add(optionLabel3);
         panel.add(space);
+        panel.add(Box.createVerticalGlue());
         panel.revalidate();
         panel.repaint();
     }
@@ -91,19 +102,26 @@ public class CreatePollPanel extends JPanel {
         addQBT.setBackground(new Color(37, 37, 37));
         addQBT.setForeground(new Color(208, 208, 208));
         addQBT.setFont(new Font("Arial", Font.BOLD, 15));
+
         addQBT.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         addQBT.setBorderPainted(false);
-        addQBT.setPreferredSize(new Dimension(400, 70));
+        addQBT.setPreferredSize(new Dimension(300, 70));
+        addQBT.setMinimumSize(new Dimension(300, 70));
+        addQBT.setMaximumSize(new Dimension(300, 70));
 
         addQBT.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                AddQuestion addQuestion = new AddQuestion(frame);
-                addQuestion.setLocationRelativeTo(frame);
-                addQuestion.setVisible(true);
-                if (addQuestion.isFull() && poll.getCurrentSize() <= 3) {
-                    addCard(panel ,addQuestion.getQuestionValue(), addQuestion.getAnswerValue1(), addQuestion.getAnswerValue2(), addQuestion.getAnswerValue3());
-                    addPollItem(addQuestion.getQuestionValue(), addQuestion.getAnswerValue1(), addQuestion.getAnswerValue2(), addQuestion.getAnswerValue3());
+                if ( poll.getCurrentSize() < 3) {
+                    AddQuestion addQuestion = new AddQuestion(frame);
+                    addQuestion.setLocationRelativeTo(frame);
+                    addQuestion.setVisible(true);
+                    if (addQuestion.isFull()) {
+                        addCard(panel, addQuestion.getQuestionValue(), addQuestion.getAnswerValue1(), addQuestion.getAnswerValue2(), addQuestion.getAnswerValue3());
+                        addPollItem(addQuestion.getQuestionValue(), addQuestion.getAnswerValue1(), addQuestion.getAnswerValue2(), addQuestion.getAnswerValue3());
+                    }
+                }else {
+                    JOptionPane.showMessageDialog(null, "Three questions is enough, don't you think?");
                 }
             }
         });
@@ -118,7 +136,9 @@ public class CreatePollPanel extends JPanel {
         addQBT.setFont(new Font("Arial", Font.BOLD, 15));
         addQBT.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         addQBT.setBorderPainted(false);
-        addQBT.setPreferredSize(new Dimension(400, 70));
+        addQBT.setPreferredSize(new Dimension(300, 70));
+        addQBT.setMinimumSize(new Dimension(300, 70));
+        addQBT.setMaximumSize(new Dimension(300, 70));
         addQBT.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -136,14 +156,30 @@ public class CreatePollPanel extends JPanel {
         addQBT.setBackground(new Color(37, 37, 37));
         addQBT.setForeground(new Color(208, 208, 208));
         addQBT.setFont(new Font("Arial", Font.BOLD, 15));
-        addQBT.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 10));
+        addQBT.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         addQBT.setBorderPainted(false);
-        addQBT.setPreferredSize(new Dimension(400, 70));
+        addQBT.setPreferredSize(new Dimension(300, 70));
+        addQBT.setMinimumSize(new Dimension(300, 70));
+        addQBT.setMaximumSize(new Dimension(300, 70));
 
         addQBT.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //todo
+                AddSubject subject = new AddSubject(frame);
+                subject.setLocationRelativeTo(frame);
+                subject.setVisible(true);
+                if (subject.isFull()){
+                    GptApi gptApi = new GptApi();
+                    poll = gptApi.createWithGpt(subject.getSubject(), subject.getNumber());
+                    panel.removeAll();
+                    for (PollItem p : poll.getQuestions()) {
+                        if (p == null){
+                            continue;
+                        }
+                        addCard(panel, p.getQuestion(), p.getAnswer()[0], p.getAnswer()[1], p.getAnswer()[2]);
+                        repaint();
+                    }
+                }
             }
         });
         return addQBT;

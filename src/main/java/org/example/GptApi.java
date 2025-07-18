@@ -38,7 +38,6 @@ public class GptApi {
                 JSONObject jsonObject = new JSONObject(response.body().string());
                 question = jsonObject.getString("extra");
                 parts = question.split("#");
-                System.out.println(Arrays.toString(parts));
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -46,11 +45,11 @@ public class GptApi {
         return parts;
     }
 
-    public Poll createByGpt(String sub, int sumQuestions){
+    public Poll createWithGpt(String sub, int sumQuestions){
         String[] parts = gpt(sub, sumQuestions);
         Poll poll = new Poll();
 
-        for (int i = 0; i < poll.getCurrentSize(); i++) {
+        for (int i = 0; i < parts.length/4 ; i++) {
             int index = i * 4;
             String question = parts[index].trim();
             PollItem pollItem = new PollItem(question);
@@ -60,7 +59,6 @@ public class GptApi {
             }
             poll.addQuestion(pollItem);
         }
-        System.out.println(poll);
         return poll;
     }
 

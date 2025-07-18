@@ -25,7 +25,6 @@ public class Main {
 
         //create poll
         createPoll(window);
-        window.repaint();
 
         //send poll
         bot.sendPoll(poll);
@@ -33,12 +32,6 @@ public class Main {
         // waiting...
         waiting(window, bot);
 
-        System.out.println(calculateStatistic(poll.getQuestions()[0], 0));
-        System.out.println(calculateStatistic(poll.getQuestions()[0], 1));
-        System.out.println(calculateStatistic(poll.getQuestions()[0], 2));
-
-        //show result
-        showResult(window);
 
     }
 
@@ -47,41 +40,64 @@ public class Main {
         CreatePollPanel pollPanel = new CreatePollPanel(WIDTH, HEIGHT, window);
         window.add(pollPanel);
         window.setVisible(true);
-        window.setLocationRelativeTo(null);
-        window.setTitle("Poll bot");
         while (!pollPanel.isSend()){
             sleepFor(100);
         }
         poll = pollPanel.getPoll();
         window.remove(pollPanel);
+        window.repaint();
     }
 
     public static void waiting(JFrame window, MyBot bot) {
-        int minutes = 5;
-        long startTime = System.currentTimeMillis();
+        WaitPanel waitPanel = new WaitPanel(WIDTH, HEIGHT);
 
-        while (System.currentTimeMillis() - startTime < 60000 * minutes) {
-            if(bot.isAllAnswered()){
-                break;
+        JLayeredPane layeredPane = window.getLayeredPane();
+        long startTime = System.currentTimeMillis();
+        SwingUtilities.invokeLater(() -> {
+            waitPanel.setBounds(0, 0, WIDTH, HEIGHT);
+            layeredPane.add(waitPanel, JLayeredPane.PALETTE_LAYER);
+            layeredPane.revalidate();
+            layeredPane.repaint();
+        });
+
+        new Thread(() -> {
+            int minutes = 5;
+
+            while (System.currentTimeMillis() - startTime < 60000 * minutes && !bot.isAllAnswered()) {
+                sleepFor(100);
+                long mill = 5 *60000 -(System.currentTimeMillis() - startTime);
+                int currentMinutes = (int)(mill / 1000) / 60;
+                int currentSeconds = (int)(mill / 1000) % 60;
+                waitPanel.updateTime(currentMinutes, currentSeconds);
             }
 
-            //todo add waiting screen
+            SwingUtilities.invokeLater(() -> {
+                layeredPane.remove(waitPanel);
+                showResult(window);
+                layeredPane.revalidate();
+                layeredPane.repaint();
+            });
 
-            sleepFor(100);
-        }
+        }).start();
     }
-
     public static void showResult(JFrame window) {
+        PollResultsPanel p = new PollResultsPanel(poll, WIDTH, HEIGHT);
+        window.getContentPane().removeAll();
+        window.add(p);
+        SwingUtilities.invokeLater(() -> {
+            window.revalidate();
+            window.repaint();
+        });
         //todo
     }
 
     public static int calculateStatistic(PollItem pollItem, int questionNumber) {
-        int numOfUsers = pollItem.howManyAnswers();
-        return (pollItem.getAnswerCount()[questionNumber] / numOfUsers) * 100;
+        float numOfUsers = pollItem.howManyAnswers();
+        System.out.println("Number of users: " + numOfUsers + "; sum: " + pollItem.getAnswerCount()[questionNumber] + ";");
+        return (int) ((pollItem.getAnswerCount()[questionNumber]/numOfUsers) * 100);
     }
 
     public static void windowConfig(JFrame window, MyBot bot) {
-        Poll poll = new Poll();
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setSize(1080, 720);
         window.setResizable(false);
