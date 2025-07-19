@@ -30,7 +30,7 @@ public class PollResultsPanel extends JPanel {
             JLabel questionLabel = new JLabel(questionItem.getQuestion(), SwingConstants.LEFT);
             questionLabel.setFont(new Font("Arial", Font.BOLD, 25));
             questionLabel.setForeground(new Color(150, 200, 255));
-            questionLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            questionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             this.add(questionLabel);
             this.add(Box.createRigidArea(new Dimension(0, 20)));
 

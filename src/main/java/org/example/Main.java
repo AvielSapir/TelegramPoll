@@ -13,6 +13,7 @@ public class Main {
     static int HEIGHT = 720;
     static Poll poll = new Poll();
 
+    private static volatile boolean isContinueClicked = false;
 
     public static void main(String[] args) {
         //bot
@@ -23,14 +24,24 @@ public class Main {
         JFrame window = new JFrame();
         windowConfig(window, bot);
 
-        //create poll
-        createPoll(window);
+        while(true) {
+            //create poll
+            createPoll(window);
 
-        //send poll
-        bot.sendPoll(poll);
+            //send poll
+            bot.sendPoll(poll);
 
-        // waiting...
-        waiting(window, bot);
+            // waiting...
+            Thread waitingThread = waiting(window, bot);
+            try {
+                waitingThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            bot.clearPollAnswers();
+            poll.clearPoll();
+        }
 
 
     }
@@ -48,7 +59,7 @@ public class Main {
         window.repaint();
     }
 
-    public static void waiting(JFrame window, MyBot bot) {
+    public static Thread waiting(JFrame window, MyBot bot) {
         WaitPanel waitPanel = new WaitPanel(WIDTH, HEIGHT);
 
         JLayeredPane layeredPane = window.getLayeredPane();
@@ -60,7 +71,7 @@ public class Main {
             layeredPane.repaint();
         });
 
-        new Thread(() -> {
+        Thread waitingThread = new Thread(() -> {
             int minutes = 5;
 
             while (System.currentTimeMillis() - startTime < 60000 * minutes && !bot.isAllAnswered()) {
@@ -71,30 +82,59 @@ public class Main {
                 waitPanel.updateTime(currentMinutes, currentSeconds);
             }
 
-            SwingUtilities.invokeLater(() -> {
-                layeredPane.remove(waitPanel);
-                showResult(window);
-                layeredPane.revalidate();
-                layeredPane.repaint();
-            });
+            try {
+                SwingUtilities.invokeAndWait(() -> {
+                    layeredPane.remove(waitPanel);
+                    showResult(window);
+                    layeredPane.revalidate();
+                    layeredPane.repaint();
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-        }).start();
+            isContinueClicked = false;
+            while (!isContinueClicked) {
+                sleepFor(100);
+            }
+
+            SwingUtilities.invokeLater(() -> {
+                window.getContentPane().removeAll();
+                window.revalidate();
+                window.repaint();
+            });
+        });
+
+        waitingThread.start();
+        return waitingThread;
     }
     public static void showResult(JFrame window) {
         PollResultsPanel p = new PollResultsPanel(poll, WIDTH, HEIGHT);
         window.getContentPane().removeAll();
         window.add(p);
+
+        JButton continueButton = new JButton("New Poll");
+        continueButton.setBackground(new Color(46, 46, 53));
+        continueButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        continueButton.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        continueButton.setBorderPainted(false);
+        continueButton.setPreferredSize(new Dimension(200, 50));
+        continueButton.setMinimumSize(new Dimension(200, 50));
+        continueButton.setMaximumSize(new Dimension(200, 50));
+        continueButton.setForeground(new Color(208, 208, 208));
+        continueButton.setFont(new Font("Arial", Font.BOLD, 15));
+        continueButton.addActionListener(e -> {
+            isContinueClicked = true;
+        });
+        p.add(continueButton);
+        p.add(Box.createVerticalGlue());
+
+        System.out.println("Poll Results");
+
         SwingUtilities.invokeLater(() -> {
             window.revalidate();
             window.repaint();
         });
-        //todo
-    }
-
-    public static int calculateStatistic(PollItem pollItem, int questionNumber) {
-        float numOfUsers = pollItem.howManyAnswers();
-        System.out.println("Number of users: " + numOfUsers + "; sum: " + pollItem.getAnswerCount()[questionNumber] + ";");
-        return (int) ((pollItem.getAnswerCount()[questionNumber]/numOfUsers) * 100);
     }
 
     public static void windowConfig(JFrame window, MyBot bot) {

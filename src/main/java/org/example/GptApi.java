@@ -28,16 +28,17 @@ public class GptApi {
                     "(Answer3)\n" +
                     "\n" +
                     "Not a test-like question, but a preference questionnaire.\n" +
-                    "I want it to be in this format without additions before and after, between each sentence - question or answer there will be a # but not in the end\n" +
+                    "I want it to be in this format without additions before or after.Each part (question or answer) must be separated by #."+
+                    "That is, after each question or answer there must be this character for separation." +
                     "The topic of the question is only about:" + question;
             String url = "https://app.seker.live/fm1/send-message?id=330745084&text=" +
                     URLEncoder.encode(porompt, StandardCharsets.UTF_8);
 
-                Request request = new Request.Builder().url(url).build();
-                Response response = client.newCall(request).execute();
-                JSONObject jsonObject = new JSONObject(response.body().string());
-                question = jsonObject.getString("extra");
-                parts = question.split("#");
+            Request request = new Request.Builder().url(url).build();
+            Response response = client.newCall(request).execute();
+            JSONObject jsonObject = new JSONObject(response.body().string());
+            question = jsonObject.getString("extra");
+            parts = question.split("#");
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -48,7 +49,7 @@ public class GptApi {
     public Poll createWithGpt(String sub, int sumQuestions){
         String[] parts = gpt(sub, sumQuestions);
         Poll poll = new Poll();
-
+        System.out.println(Arrays.toString(parts));
         for (int i = 0; i < parts.length/4 ; i++) {
             int index = i * 4;
             String question = parts[index].trim();

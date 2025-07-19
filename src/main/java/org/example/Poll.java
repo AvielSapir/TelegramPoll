@@ -35,4 +35,9 @@ public class Poll {
     public void setCurrentSize(int currentSize) {
         this.currentSize = currentSize;
     }
+
+    public void clearPoll() {
+        this.currentSize = 0;
+        this.questions = new PollItem[3];
+    }
 }

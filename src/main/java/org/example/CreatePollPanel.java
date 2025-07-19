@@ -23,6 +23,7 @@ public class CreatePollPanel extends JPanel {
 
         JPanel panel1 = new JPanel();
         JPanel panel2 = new JPanel();
+        JPanel panel3 = new JPanel();
         panel1.setBackground(new Color(27, 27, 27));
         panel2.setBackground(new Color(37, 37, 37));
 
@@ -35,9 +36,6 @@ public class CreatePollPanel extends JPanel {
         JButton sendButton = sendBT(window, panel2);
         JButton gptButton = gptBT(window, panel2);
 
-//        panel1.add(addQButton);
-//        panel1.add(sendButton);
-//        panel1.add(gptButton);
 
         addQButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         sendButton.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -49,6 +47,7 @@ public class CreatePollPanel extends JPanel {
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         titleLabel.setBorder(BorderFactory.createEmptyBorder(40, 0, 40, 0));
         panel1.add(titleLabel);
+        panel2.add(Box.createVerticalGlue());
 
         //panel1.add(Box.createVerticalStrut(100));
         //panel1.add(Box.createVerticalGlue());
@@ -121,7 +120,7 @@ public class CreatePollPanel extends JPanel {
                         addPollItem(addQuestion.getQuestionValue(), addQuestion.getAnswerValue1(), addQuestion.getAnswerValue2(), addQuestion.getAnswerValue3());
                     }
                 }else {
-                    JOptionPane.showMessageDialog(null, "Three questions is enough, don't you think?");
+                    JOptionPane.showMessageDialog(null, "Three questions is enough, don't you think?", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -143,9 +142,31 @@ public class CreatePollPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (poll.getCurrentSize() >= 1) {
-                    send = true;
-                }else {
-                    JOptionPane.showMessageDialog(null, "You need to send at least one question");
+                    String input = JOptionPane.showInputDialog(frame, "Enter a delay time in seconds before sending the survey: ", "Delay time", JOptionPane.QUESTION_MESSAGE);
+
+                    if (input != null && !input.isEmpty()) {
+                        try {
+                            int delaySeconds = Integer.parseInt(input);
+                            if (delaySeconds > 0) {
+                                Thread delayThread = new Thread(() -> {
+                                    try {
+                                        JOptionPane.showMessageDialog(frame, "The survey will be sent in " + delaySeconds + " Seconds. ", " The survey was sent. ", JOptionPane.INFORMATION_MESSAGE);
+                                        Thread.sleep(delaySeconds * 1000);
+                                        send = true;
+                                    } catch (InterruptedException ex) {
+                                        ex.printStackTrace();
+                                    }
+                                });
+                                delayThread.start();
+                            } else {
+                                send = true;
+                            }
+                        } catch (NumberFormatException ex) {
+                            JOptionPane.showMessageDialog(frame, "Please enter a valid number. ", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(frame, "It's a bit strange to send an empty poll. ", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });

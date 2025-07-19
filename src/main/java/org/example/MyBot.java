@@ -39,10 +39,18 @@ public class MyBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         System.out.println("message received");
         if (update.hasMessage() && update.getMessage().hasText()) {
-            if (Objects.equals(update.getMessage().getText().toLowerCase(), "/start") || Objects.equals(update.getMessage().getText(), "hi") || Objects.equals(update.getMessage().getText(), "היי")) {
+            if (Objects.equals(update.getMessage().getText().toLowerCase(), "/start") || Objects.equals(update.getMessage().getText().toLowerCase(), "hi") || Objects.equals(update.getMessage().getText(), "היי")) {
                 Long chatId = update.getMessage().getChatId();
                 if (userManager.addUserId(chatId)) {
-                    sendMessage(chatId, "hello! welcome to poll bot!");
+                    String name = update.getMessage().getFrom().getUserName();
+                    int size = this.userManager.getUsersId().size();
+                    for (Long id:this.userManager.getUsersId()) {
+                        if (!Objects.equals(id, chatId)) {
+                            sendMessage(id, name + " Join the community! The community size is now - " + size);
+                        }else {
+                            sendMessage(chatId, "hello! welcome to poll bot!");
+                        }
+                    }
                     return;
                 }
             }
@@ -123,5 +131,9 @@ public class MyBot extends TelegramLongPollingBot {
             }
         }
         return true;
+    }
+
+    public void clearPollAnswers() {
+        this.pollIdMap.clear();
     }
 }
