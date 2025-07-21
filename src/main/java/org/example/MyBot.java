@@ -86,19 +86,19 @@ public class MyBot extends TelegramLongPollingBot {
         }
     }
 
-    public void sendPoll(Poll poll) {
+    public boolean sendPoll(Poll poll) {
         if (poll == null) {
-            return;
+            return false;
         }
         this.currentPoll = poll;
         PollItem[] questions = currentPoll.getQuestions();
-//        if (this.userManager.getUsersId().size() < 3) {
-//            System.out.println("not enough users! ");
-//            return;
-//        }
+        if (this.userManager.getUsersId().size() < 3) {
+            System.out.println("not enough users! ");
+            return false;
+        }
         if (questions.length == 0) {
             System.out.println("no poll questions");
-            return;
+            return false;
         }
 
         for (long user: this.userManager.getUsersId()) {
@@ -121,7 +121,7 @@ public class MyBot extends TelegramLongPollingBot {
 
                 if (validOptions.size() < 2) {
                     System.err.println("Error on my bot");
-                    return;
+                    return false;
                 }
                 sendPoll.setOptions(validOptions);
                 try {
@@ -133,6 +133,7 @@ public class MyBot extends TelegramLongPollingBot {
                 }
             }
         }
+        return true;
     };
 
     public boolean isAllAnswered(){

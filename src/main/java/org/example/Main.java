@@ -30,7 +30,13 @@ public class Main {
             createPoll(window);
 
             //send poll
-            bot.sendPoll(poll);
+            if (!bot.sendPoll(poll)) {
+                JOptionPane.showMessageDialog(null, "You need at least 3 community members", "Error", JOptionPane.ERROR_MESSAGE);
+                bot.clearPollAnswers();
+                poll.clearPoll();
+                continue;
+            }
+
 
             // waiting...
             Thread waitingThread = waiting(window, bot);
