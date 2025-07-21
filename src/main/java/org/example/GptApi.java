@@ -31,7 +31,7 @@ public class GptApi {
                     "I want it to be in this format without additions before or after.Each part (question or answer) must be separated by #."+
                     "That is, after each question or answer there must be this character for separation." +
                     "The topic of the question is only about:" + question;
-            String url = "https://app.seker.live/fm1/send-message?id=330745084&text=" +
+            String url = BotConfig.getGptApi() +
                     URLEncoder.encode(porompt, StandardCharsets.UTF_8);
 
             Request request = new Request.Builder().url(url).build();

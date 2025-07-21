@@ -9,6 +9,8 @@ public class BotConfig {
     private static String userName;
     private static String token;
 
+    private static String gptApi;
+
     static {
         try {
             Properties properties = new Properties();
@@ -22,6 +24,7 @@ public class BotConfig {
 
             userName = properties.getProperty("bot.username");
             token = properties.getProperty("bot.token");
+            gptApi = properties.getProperty("gpt.api");
 
         } catch (IOException e) {
             System.err.println("Failed to load bot config: " + e.getMessage());
@@ -34,5 +37,9 @@ public class BotConfig {
 
     public static String getToken() {
         return token;
+    }
+
+    public static String getGptApi() {
+        return gptApi;
     }
 }
