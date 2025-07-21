@@ -27,11 +27,11 @@ public class MyBot extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return "AvielOriPollBot";
+        return BotConfig.getUserName();
     }
 
     public String getBotToken() {
-        return "7772509307:AAG3dBf92f5C-5sfLKmFsCPhdI7sk0kbzbk";
+        return BotConfig.getToken();
     }
 
 
