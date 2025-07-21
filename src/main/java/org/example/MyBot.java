@@ -109,7 +109,21 @@ public class MyBot extends TelegramLongPollingBot {
                     continue;
                 }
                 sendPoll.setQuestion(question.getQuestion());
-                sendPoll.setOptions(Arrays.stream(question.getAnswer()).toList());
+
+                List<String> validOptions = new ArrayList<>();
+
+                String[] allAnswers = question.getAnswer();
+                for (String answer : allAnswers) {
+                    if (answer != null && !answer.trim().isEmpty()) {
+                        validOptions.add(answer);
+                    }
+                }
+
+                if (validOptions.size() < 2) {
+                    System.err.println("Error on my bot");
+                    return;
+                }
+                sendPoll.setOptions(validOptions);
                 try {
                     Message sentMessage = execute(sendPoll);
                     this.pollIdMap.put(sentMessage.getPoll().getId(), question);
