@@ -13,7 +13,7 @@ public class PollItem {
     public PollItem(String questions) {
         this.question = questions;
         this.answer = new String[3];
-        this.answerCount = new int[3];
+        this.answerCount = new int[4];
         this.currentAnswerIndex = 0;
 
     }
@@ -61,5 +61,9 @@ public class PollItem {
 
     public int howManyAnswers() {
         return Arrays.stream(this.answerCount).sum();
+    }
+
+    public int getCurrentAnswerIndex() {
+        return currentAnswerIndex;
     }
 }

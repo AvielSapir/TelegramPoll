@@ -64,17 +64,16 @@ public class CreatePollPanel extends JPanel {
 
     }
 
-    public void addCard(JPanel panel,String question, String option1, String option2, String option3) {
+    public void addCard(JPanel panel, String question, String[] options) {
         JLabel questionLabel = newLabel(question, 25);
-        JLabel optionLabel1 = newLabel(option1, 18);
-        JLabel optionLabel2 = newLabel(option2, 18);
-        JLabel optionLabel3 = newLabel(option3, 18);
-        JLabel space = newLabel("", 10);
-
         panel.add(questionLabel);
-        panel.add(optionLabel1);
-        panel.add(optionLabel2);
-        panel.add(optionLabel3);
+
+        for (String option : options) {
+            if (option != null && !option.isEmpty()) {
+                panel.add(newLabel(option, 18));
+            }
+        }
+        JLabel space = newLabel("", 10);
         panel.add(space);
         panel.add(Box.createVerticalGlue());
         panel.revalidate();
@@ -116,9 +115,11 @@ public class CreatePollPanel extends JPanel {
                     addQuestion.setLocationRelativeTo(frame);
                     addQuestion.setVisible(true);
                     if (addQuestion.isFull()) {
-                        addCard(panel, addQuestion.getQuestionValue(), addQuestion.getAnswerValue1(), addQuestion.getAnswerValue2(), addQuestion.getAnswerValue3());
-                        addPollItem(addQuestion.getQuestionValue(), addQuestion.getAnswerValue1(), addQuestion.getAnswerValue2(), addQuestion.getAnswerValue3());
+                        String[] answers = addQuestion.getAnswerValue();
+                        addCard(panel, addQuestion.getQuestionValue(), answers);
+                        addPollItem(addQuestion.getQuestionValue(), answers);
                     }
+// ...
                 }else {
                     JOptionPane.showMessageDialog(null, "Three questions is enough, don't you think?", "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -197,20 +198,24 @@ public class CreatePollPanel extends JPanel {
                         if (p == null){
                             continue;
                         }
-                        addCard(panel, p.getQuestion(), p.getAnswer()[0], p.getAnswer()[1], p.getAnswer()[2]);
+                        String[] answers = p.getAnswer();
+                        addCard(panel, p.getQuestion(), answers);
                         repaint();
                     }
+// ...
                 }
             }
         });
         return addQBT;
     }
 
-    private void addPollItem(String question, String option1, String option2, String option3) {
+    private void addPollItem(String question, String[] options) {
         PollItem pollItem = new PollItem(question);
-        pollItem.addAnswer(option1);
-        pollItem.addAnswer(option2);
-        pollItem.addAnswer(option3);
+        for (String option : options) {
+            if (option != null) {
+                pollItem.addAnswer(option);
+            }
+        }
         this.poll.addQuestion(pollItem);
     }
 

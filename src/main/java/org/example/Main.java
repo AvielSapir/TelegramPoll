@@ -16,6 +16,7 @@ public class Main {
     private static volatile boolean isContinueClicked = false;
 
     public static void main(String[] args) {
+
         //bot
         MyBot bot = new MyBot();
         botConfig(bot);

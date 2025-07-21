@@ -5,22 +5,25 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AddQuestion extends JDialog {
 
     private boolean full = false;
     private String questionValue;
-    private String answerValue1;
-    private String answerValue2;
-    private String answerValue3;
+
+    private String[] optionsValue = new String[4];
     private JLabel question;
     private JLabel option1;
     private JLabel option2;
     private JLabel option3;
+    private JLabel option4;
     private JTextField questionField;
     private JTextField optionField1;
     private JTextField optionField2;
     private JTextField optionField3;
+    private JTextField optionField4;
     private JButton okButton;
 
     private JTextField textField;
@@ -30,28 +33,27 @@ public class AddQuestion extends JDialog {
         super(parent, "Add Question", true);
         setSize(300, 150);
         setLocationRelativeTo(parent);
-        setLayout(new GridLayout(5, 2, 10, 10));
+        setLayout(new GridLayout(6, 2, 10, 10));
         getContentPane().setBackground(new Color(61, 61, 61));
         setSize(500, 250);
         setResizable(false);
 
         questionValue = "";
-        answerValue1 = "";
-        answerValue2 = "";
-        answerValue3 = "";
 
         textField = new JTextField(20);
 
         this.question = newLabel("Enter question: ", 20);
-        this.option1 = newLabel("Enter option 1: ", 17);
-        this.option2 = newLabel("Enter option 2: ", 17);
-        this.option3 = newLabel("Enter option 3: ", 17);
+        this.option1 = newLabel("Option 1: ", 17);
+        this.option2 = newLabel("Option 2: ", 17);
+        this.option3 = newLabel("Option 3: ", 17);
+        this.option4 = newLabel("Option 4: ", 17);
         JLabel empty = new JLabel("", JLabel.CENTER);
 
         this.questionField = newTextField();
         this.optionField1 = newTextField();
         this.optionField2 = newTextField();
         this.optionField3 = newTextField();
+        this.optionField4 = newTextField();
 
         this.okButton = newButton("Save", 20);
 
@@ -67,6 +69,9 @@ public class AddQuestion extends JDialog {
 
         add(option3);
         add(optionField3);
+
+        add(option4);
+        add(optionField4);
 
         add(empty);
         add(okButton);
@@ -105,23 +110,31 @@ public class AddQuestion extends JDialog {
                     JOptionPane.showMessageDialog(null, "Please enter question");
                     return;
                 }
-                if (optionField1.getText().isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Please enter option 1");
-                    return;
-                }
-                if (optionField2.getText().isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Please enter option 2");
-                    return;
-                }
-                if (optionField3.getText().isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Please enter option 3");
-                    return;
-                }
 
+                int filledOptions = 0;
+                if (!optionField1.getText().isEmpty()) {
+                    filledOptions++;
+                }
+                if (!optionField2.getText().isEmpty()) {
+                    filledOptions++;
+                }
+                if (!optionField3.getText().isEmpty()) {
+                    filledOptions++;
+                }
+                if (!optionField4.getText().isEmpty()) {
+                    filledOptions++;
+                }
+                if (filledOptions < 2) {
+                    JOptionPane.showMessageDialog(null, "Please enter at least two options.");
+                    return;
+                }
                 questionValue = questionField.getText();
-                answerValue1 = optionField1.getText();
-                answerValue2 = optionField2.getText();
-                answerValue3 = optionField3.getText();
+
+                optionsValue[0] = optionField1.getText().isEmpty() ? null : optionField1.getText();
+                optionsValue[1] = optionField2.getText().isEmpty() ? null : optionField2.getText();
+                optionsValue[2] = optionField3.getText().isEmpty() ? null : optionField3.getText();
+                optionsValue[3] = optionField4.getText().isEmpty() ? null : optionField4.getText();
+
                 full = true;
                 dispose();
             }
@@ -136,13 +149,21 @@ public class AddQuestion extends JDialog {
     public String getQuestionValue() {
         return questionValue;
     }
-    public String getAnswerValue1() {
-        return answerValue1;
-    }
-    public String getAnswerValue2() {
-        return answerValue2;
-    }
-    public String getAnswerValue3() {
-        return answerValue3;
+    public String[] getAnswerValue() {
+        List<String> filledOptions = new ArrayList<>();
+        if (optionsValue[0] != null) {
+            filledOptions.add(optionsValue[0]);
+        }
+        if (optionsValue[1] != null) {
+            filledOptions.add(optionsValue[1]);
+        }
+        if (optionsValue[2] != null) {
+            filledOptions.add(optionsValue[2]);
+        }
+        if (optionsValue[3] != null) {
+            filledOptions.add(optionsValue[3]);
+        }
+
+        return filledOptions.toArray(new String[0]);
     }
 }
